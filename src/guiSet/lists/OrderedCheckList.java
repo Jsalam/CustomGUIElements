@@ -1,4 +1,4 @@
-package guiSet.list;
+package guiSet.lists;
 
 import java.awt.Color;
 

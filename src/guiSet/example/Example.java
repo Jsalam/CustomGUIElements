@@ -4,12 +4,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 import guiSet.GuiSet;
+import guiSet.buttons.Item;
+import guiSet.buttons.PushButton;
 import guiSet.elements.GuiElement;
-import guiSet.elements.Item;
-import guiSet.list.CheckList;
-import guiSet.list.DropdownList;
-import guiSet.list.OrderedCheckList;
-import guiSet.list.RadioButtonList;
+import guiSet.lists.CheckList;
+import guiSet.lists.DropdownList;
+import guiSet.lists.OrderedCheckList;
+import guiSet.lists.RadioButtonList;
 import processing.core.*;
 
 public class Example extends PApplet implements Observer {
@@ -18,6 +19,7 @@ public class Example extends PApplet implements Observer {
 	OrderedCheckList selectableList;
 	CheckList simpleList;
 	Item item;
+	PushButton button;
 	DropdownList dropdown;
 	RadioButtonList radioButtonList;
 
@@ -40,9 +42,14 @@ public class Example extends PApplet implements Observer {
 		simpleList.setItems(labels, true);
 
 		// Item
-		item = new Item(new PVector(100, 50), new PVector(150, 17));
+		item = new Item(new PVector(100, 30), new PVector(150, 17));
 		item.setName("Toggle");
 		item.setLabel("click me");
+		
+		// Button
+		button = new PushButton(new PVector(300, 30), new PVector(150, 17));
+		button.setName("Push");
+		button.setLabel("click me");
 
 		// DropdownList
 		dropdown = new DropdownList(500, 100, "Dropdown");
@@ -56,6 +63,7 @@ public class Example extends PApplet implements Observer {
 		guiSet.addGuiElement(selectableList);
 		guiSet.addGuiElement(simpleList);
 		guiSet.addGuiElement(item);
+		guiSet.addGuiElement(button);
 		guiSet.addGuiElement(dropdown);
 		guiSet.addGuiElement(radioButtonList);
 
@@ -63,6 +71,7 @@ public class Example extends PApplet implements Observer {
 
 		// Add observable elements to GuiSet observer
 		guiSet.addObserverToGuiElement(this, "Toggle");
+		guiSet.addObserverToGuiElement(this, "Push");
 		guiSet.addObserverToGuiElement(this, "Simple List");
 		guiSet.addObserverToGuiElement(this, "Selectable List");
 		guiSet.addObserverToGuiElement(this, "Dropdown");

@@ -1,7 +1,8 @@
-package guiSet.elements;
+package guiSet.buttons;
 
 import java.awt.Color;
 
+import guiSet.elements.GuiElement;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;

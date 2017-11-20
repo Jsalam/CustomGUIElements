@@ -1,35 +1,35 @@
-package guiSet.list;
+package guiSet.lists;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
+import guiSet.buttons.Item;
 import guiSet.elements.GuiElement;
-import guiSet.elements.Item;
-import processing.core.PApplet;
-import processing.core.PFont;
-import processing.core.PVector;
+import processing.core.*;
 import processing.event.MouseEvent;
 
 /**
- * List of items for user single selection. The items are set by the
- * setItems(Item[]) method. Each Item is a button in the list.
+ * Clickable list of items. The items are set by the setItems(Item[]) method.
+ * Each Item is a button in the list. It has three show methods, two of them are
+ * intended to display the target list with circular o rectangular nested
+ * structure, i.e. lists that start empty and are filled by user selection of
+ * items from the sourceList.
  * 
  * @author jsalam
  *
  */
-public class RadioButtonList extends GuiElement implements Observer {
+public class CheckList extends GuiElement {
 
 	private ArrayList<Item> itemList;
-	private Item selectedItem;
+	private CheckList linkedList;
+	private Item removedItem;
 	private PVector pos;
 	private PVector itemSize = new PVector(100, 17);
 	public Color textColor = new Color(165, 199, 236);
 	private int capacity = Integer.MAX_VALUE;
 	PFont font;
 
-	public RadioButtonList(float x, float y, String name) {
+	public CheckList(float x, float y, String name) {
 		super();
 
 		itemList = new ArrayList<Item>();
@@ -37,6 +37,8 @@ public class RadioButtonList extends GuiElement implements Observer {
 		pos = new PVector(x, y);
 
 		this.name = name;
+
+		// registerEvents();
 	}
 
 	/**
@@ -53,7 +55,6 @@ public class RadioButtonList extends GuiElement implements Observer {
 		for (int i = 0; i < items.length; i++) {
 			items[i].setPosAndDimension(pos, itemSize, i);
 			items[i].setEnableSelectBehavior(enableSelectBehavior);
-			items[i].addObserver(this);
 			items[i].setNameVisibility(false);
 			itemList.add(items[i]);
 		}
@@ -79,9 +80,8 @@ public class RadioButtonList extends GuiElement implements Observer {
 		for (int i = 0; i < labels.length; i++) {
 			listItems[i] = new Item();
 			listItems[i].setName(this.name + "_" + labels[i]);
-			listItems[i].setNameVisibility(false);
 			listItems[i].setLabel(labels[i]);
-			listItems[i].addObserver(this);
+			listItems[i].setNameVisibility(false);
 		}
 		return listItems;
 	}
@@ -97,10 +97,77 @@ public class RadioButtonList extends GuiElement implements Observer {
 			app.stroke(155);
 			app.strokeWeight(1);
 			app.line(pos.x, pos.y, pos.x + itemSize.x, pos.y);
-			for (Item i : itemList) {
-				i.show(app);
+			for (int i = 0; i < itemList.size(); i++) {
+				itemList.get(i).show(app);
 			}
 		}
+	}
+
+	/**
+	 * Show the list of items with an arc displaying the inverted order of
+	 * items. Specially intended for target lists
+	 */
+	public void showCircular(PApplet app) {
+		app.fill(textColor.getRGB());
+		if (isLabelVisible())
+			app.text(label, pos.x + 2, pos.y - 2);
+		app.stroke(155);
+		app.strokeWeight(1);
+		app.line(pos.x, pos.y, pos.x + itemSize.x, pos.y);
+
+		for (int i = 0; i < itemList.size(); i++) {
+			itemList.get(i).show(app);
+			app.fill(255, 30);
+			app.noStroke();
+			app.arc(pos.x - 2, pos.y + (itemSize.y * (itemList.size())), (itemSize.y * 2) * (i + 1),
+					(itemSize.y * 2) * (i + 1), -PApplet.HALF_PI, 0);
+		}
+	}
+
+	/**
+	 * Show the list of items with a rectangle displaying the inverted order of
+	 * items. Specially intended for target lists
+	 */
+	public void showRectangular(PApplet app) {
+		app.fill(textColor.getRGB());
+		if (isNameVisible())
+			app.text(name, pos.x + 2, pos.y - 2);
+		app.stroke(155);
+		app.strokeWeight(1);
+		app.line(pos.x, pos.y, pos.x + itemSize.x, pos.y);
+
+		for (int i = 0; i < itemList.size(); i++) {
+			itemList.get(i).show(app);
+		}
+
+		for (int i = 0; i < itemList.size(); i++) {
+			app.fill(255, 30);
+			app.noStroke();
+			app.rect(pos.x + 2, 2 + pos.y + (itemSize.y * itemList.size()), itemSize.y + (i + 1) * 7,
+					-itemSize.y * (i + 1));
+			app.fill(255, 0, 0, 150);
+			app.text("x", pos.x + itemSize.x - 7, pos.y + (itemSize.y * (i + 1)));
+		}
+	}
+
+	/**
+	 * Removes the reference of the clicked item from the collection of items.
+	 * The item remains 'alive' at the pool of items
+	 * 
+	 * @param temp
+	 *            the item to be removed
+	 * 
+	 * @return true if removed
+	 */
+	public boolean removeItem(Item temp) {
+		boolean rtn = false;
+		if (temp != null) {
+			itemList.remove(temp);
+			arrangeItemPositions();
+			removedItem = temp;
+			rtn = true;
+		}
+		return rtn;
 	}
 
 	/**
@@ -146,9 +213,20 @@ public class RadioButtonList extends GuiElement implements Observer {
 	}
 
 	// ************* Getter and Setters *************
+	public Item getRemovedItem() {
+		return removedItem;
+	}
+
+	public CheckList getLinkedList() {
+		return linkedList;
+	}
 
 	public PVector getItemSize() {
 		return itemSize;
+	}
+
+	public void setLinkedList(CheckList linkedList) {
+		this.linkedList = linkedList;
 	}
 
 	public void setItemSize(PVector itemSize) {
@@ -185,23 +263,32 @@ public class RadioButtonList extends GuiElement implements Observer {
 	}
 
 	/**
-	 * Returns the selected item
+	 * Returns the list of selected items
 	 * 
-	 * @return the item
+	 * @return the list of items
 	 */
-	public Item getSelected() {
-
-		return selectedItem;
+	public Item[] getSelected() {
+		ArrayList<Item> rtn = new ArrayList<Item>();
+		for (Item i : itemList) {
+			if (i.isSelected())
+				rtn.add(i);
+		}
+		Item[] array = new Item[rtn.size()];
+		return rtn.toArray(array);
 	}
 
 	/**
-	 * Returns the selected item label
+	 * Returns the list of selected item labels
 	 * 
-	 * @return the label strings
+	 * @return the list of strings
 	 */
-	public String getSelectedLabel() {
-
-		return selectedItem.getLabel();
+	public String[] getSelectedLabels() {
+		Item[] selected = getSelected();
+		String[] rtn = new String[selected.length];
+		for (int i = 0; i < selected.length; i++) {
+			rtn[i] = selected[i].getLabel();
+		}
+		return rtn;
 	}
 
 	public ArrayList<Item> getItems() {
@@ -236,24 +323,54 @@ public class RadioButtonList extends GuiElement implements Observer {
 
 		if (isMouseOver(e)) {
 
-			if (e.getAction() == MouseEvent.CLICK) {
+			// If this is NOT a simple list
+			if (linkedList != null) {
+				switch (e.getButton()) {
 
-				for (Item i : itemList) {
-					if (i.isMouseOver(e)) {
-						selectedItem = i;
-						break;
+				case PConstants.LEFT:
+
+					// Observable
+					notifyMyObservers(this);
+
+					// control not to remove items from source if target is full
+					if (linkedList.itemList.size() < linkedList.capacity) {
+						removeItem(retrieveClickedItem(e));
 					}
+					linkedList.addItem(removedItem);
+					removedItem = null;
+
+					break;
+
+				case PConstants.RIGHT:
+					String[] listTemp = getOrderedLabelList();
+					System.out.println(name + ":");
+					for (int i = 0; i < listTemp.length; i++) {
+						System.out.println(listTemp[i]);
+					}
+					break;
 				}
+			} else {
 
-				for (Item i : itemList) {
-					if (selectedItem != null && !i.equals(selectedItem)) {
-						i.reset();
+				// If a simple list
+				switch (e.getButton()) {
+
+				case PConstants.LEFT:
+
+					// Observable
+					setChanged();
+					notifyObservers(this);
+
+					break;
+
+				case PConstants.RIGHT:
+					String[] listTemp = getSelectedLabels();
+					System.out.println(name + ":");
+					for (int i = 0; i < listTemp.length; i++) {
+						System.out.println(listTemp[i]);
 					}
+					break;
 				}
 			}
-			// Observable
-			setChanged();
-			notifyObservers(this);
 		}
 	}
 
@@ -274,10 +391,5 @@ public class RadioButtonList extends GuiElement implements Observer {
 			rtn = false;
 		}
 		return rtn;
-	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-		selectedItem = (Item) arg;
 	}
 }

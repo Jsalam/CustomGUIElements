@@ -11,9 +11,7 @@ import guiSet.lists.CheckList;
 import guiSet.lists.DropdownList;
 import guiSet.lists.OrderedCheckList;
 import guiSet.lists.RadioButtonList;
-import interfascia.GUIController;
 import processing.core.*;
-import texts.TextField;
 
 public class Example extends PApplet implements Observer {
 
@@ -24,8 +22,6 @@ public class Example extends PApplet implements Observer {
 	PushButton button;
 	DropdownList dropdown;
 	RadioButtonList radioButtonList;
-	GUIController controller;
-	TextField textField;
 
 	public void settings() {
 		size(900, 400);
@@ -62,11 +58,6 @@ public class Example extends PApplet implements Observer {
 		// Radiobutton
 		radioButtonList = new RadioButtonList(750,100,"radiobutton");
 		radioButtonList.setItems(labels,true);
-		
-		// TextField
-		controller = new GUIController(this);
-		textField = new TextField(controller);
-		textField.setPosition(500,50);
 
 		// add gui elements to this set of GUIs
 		guiSet.addGuiElement(selectableList);

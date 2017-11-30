@@ -39,7 +39,7 @@ public class GuiSet implements Observer {
 		
 		if (guiElements.contains(ge)) {
 			
-			System.out.println("Element " + ge.getName() + " was not added to the gui set. Rename it");
+			System.out.println("    Element " + ge.getName() + " was not added to the gui set. Rename it");
 		
 		} else {
 
@@ -48,7 +48,7 @@ public class GuiSet implements Observer {
 
 			guiElements.add(ge);
 			
-			System.out.println("Element " + ge.getName() + " added to the gui set");
+			System.out.println("    Element " + ge.getName() + " added to the gui set");
 		}
 	}
 

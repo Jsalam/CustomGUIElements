@@ -189,7 +189,7 @@ public class RadioButtonList extends GuiElement implements Observer {
 	 * 
 	 * @return the item
 	 */
-	public Item getSelected() {
+	public Item getSelected(){
 
 		return selectedItem;
 	}

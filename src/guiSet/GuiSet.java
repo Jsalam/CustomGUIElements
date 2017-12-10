@@ -5,12 +5,9 @@ import java.util.ConcurrentModificationException;
 import java.util.Observable;
 import java.util.Observer;
 
-import guiSet.buttons.Item;
 import guiSet.elements.GuiElement;
 import processing.core.PApplet;
-import processing.core.PConstants;
 import processing.core.PFont;
-import processing.core.PVector;
 import processing.event.MouseEvent;
 
 public class GuiSet implements Observer {

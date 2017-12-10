@@ -4,7 +4,6 @@ import java.awt.Color;
 
 import guiSet.elements.GuiElement;
 import processing.core.PApplet;
-import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PVector;
 import processing.event.MouseEvent;

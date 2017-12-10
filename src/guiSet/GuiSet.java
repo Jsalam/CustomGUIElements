@@ -1,6 +1,7 @@
 package guiSet;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -65,14 +66,22 @@ public class GuiSet implements Observer {
 	}
 
 	public void show() {
-		for (GuiElement ge : guiElements) {
-			ge.show(app);
+		try {
+			for (GuiElement ge : guiElements) {
+				ge.show(app);
+			}
+		} catch (ConcurrentModificationException cme) {
+			System.out.println(cme.toString() + " in guiSet.GuiSet");
 		}
 	}
 
 	public void show(PApplet app) {
-		for (GuiElement ge : guiElements) {
-			ge.show(app);
+		try {
+			for (GuiElement ge : guiElements) {
+				ge.show(app);
+			}
+		} catch (ConcurrentModificationException cme) {
+			System.out.println(cme.toString() + " in guiSet.GuiSet");
 		}
 
 	}
